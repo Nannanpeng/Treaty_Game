@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import fminbound
 import matplotlib.pyplot as plt
 import time
-
+# Another test case
 class GraphPlot:
     def __init__(self, begin, end, grids):
         self.xvalues = np.linspace(begin, end, grids)
