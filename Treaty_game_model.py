@@ -1,8 +1,10 @@
+### Code to solve the treaty game ###
+
 import numpy as np
 from scipy.optimize import fminbound
 import matplotlib.pyplot as plt
 import time
-# Another test case
+
 class GraphPlot:
     def __init__(self, begin, end, grids):
         self.xvalues = np.linspace(begin, end, grids)
@@ -202,7 +204,7 @@ class DP:
              print('Convergence succeeded in iteration: {}'.format(n))
              print('Land in Nash equilibrium for native and settler are: {:.2f} and {:.2f}'.format(n_land, 100-n_land))
              print('Spending in Nash equilibrium of native and settler are: {:.2f} and {:.2f}'.format(eq_spending[0], eq_spending[1]))
-             print(f'Native saving = {n_savings:.2f}\n, Settler saving = {s_savings:.2f}')
+             print(f'Native saving = {n_savings:.2f}, Settler saving = {s_savings:.2f}')
          elif n == max_iter and verbose==True:
              print('Convergence failed!')
          return np.array(ns_best_spending), np.array(n_land_list), spe_res
@@ -280,7 +282,7 @@ if __name__ == "__main__":
     
     # two logistic functions A1, B1, C1, A2, B2, C2,     D, E, H, gamma_n, beta_s
     ie = IncomeExpansion(120, 0.045, 18, 180, 0.065, 40, 8, 30, 100, 0.5, 0.5) # both logistic income function
-    sum_income = [ie.NativeIncome(land.xvalues), ie.SettlerIncome(100 - land.xvalues), ie.NativeIncome(land.xvalues)+ie.SettlerIncome(100 - land.xvalues)]
+    #sum_income = [ie.NativeIncome(land.xvalues), ie.SettlerIncome(100 - land.xvalues), ie.NativeIncome(land.xvalues)+ie.SettlerIncome(100 - land.xvalues)]
     #sep_income = [pf.NativeIncome(land.xvalues), pf.SettlerIncome(land.xvalues)]
     #cost_profit = [players3.NativeMI(land.xvalues), players3.SettlerMI(land.xvalues), \
     #               players3.NativeExpanMC(land.xvalues), players3.SettlerExpanMC(land.xvalues)]
@@ -288,10 +290,10 @@ if __name__ == "__main__":
     #land.IncomeGraph(sep_income)
     #land.CostProfit(cost_profit)
     
-    time_start = time.time()
+    #time_start = time.time()
     pd = PlayerDecision(ie, 1/6, 10)
     dp = DP(ie, pd)
-    print(dp.Simulation(65, 5))
-    #ns_best_spending, n_land_list, spe_res = dp.DynamicNE(65, saving=True)
-    #dp.PeriodResults(ns_best_spending, n_land_list)
-    print(time.time() - time_start)
+    #print(dp.Simulation(65, 5))
+    ns_best_spending, n_land_list, spe_res = dp.DynamicNE(65, saving=True)
+    dp.PeriodResults(ns_best_spending, n_land_list)
+    #print(time.time() - time_start)
