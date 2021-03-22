@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.optimize import fsolve
 from scipy.optimize import newton_krylov
-from scipy.optimize import least_squares
+from scipy.optimize import least_squares, minimize
 
 class IncomeExpansion():
     def __init__(self, A1, B1, C1, A2, B2, C2, D, E, H, gamma, beta, prob):
@@ -45,8 +45,23 @@ class IncomeExpansion():
         return s_foc
     def ComFuns(self, inits):
         land, n_spending, s_spending = inits
-        return np.array([self.NativeFOC(land, n_spending, s_spending), self.SettlerFOC(100 - land, n_spending, s_spending), self.NativeExpan(n_spending, land) - self.SettlerExpan(s_spending, 100-land)])
-        
-ie = IncomeExpansion(120, 0.045, 18, 180, 0.065, 40, 60, 30, 100, 0.5, 0.5, 0.10)
-z = least_squares(ie.ComFuns, np.array([40, 20, 40]), bounds=([0, 0.1, 0.1], [100, 100, 100]))
-print(z.x)
+        return np.array([self.NativeFOC(land, n_spending, s_spending), 
+                         self.SettlerFOC(100 - land, n_spending, s_spending), 
+                         self.NativeExpan(n_spending, land) - self.SettlerExpan(s_spending, 100-land)])
+
+def find_eq(params, if_eq = False):
+    D, E, H, alpha = params
+    ##################### A1,  B1,  C1,  A2,  B2,    C2, D,   E, H,  gamma, beta, prob
+    ie = IncomeExpansion(120, 0.045, 18, 180, 0.065, 40, D, E, H, alpha, alpha, 1/6)
+    z = least_squares(ie.ComFuns, np.array([40, 20, 40]), bounds=([0, 0.1, 0.1], [100, 200, 200]))
+    if if_eq :
+        return z.x
+    else:
+        return (z.x[0] - 60)**2
+
+x0 = np.array([5, 20, 120, 0.4])
+bounds = np.array([[0, 100], [10, 100], [100, 150], [0.1, 0.5]])
+res = minimize(find_eq, x0=x0, method="L-BFGS-B", bounds=bounds)
+print(res.x, res.success, res.fun)
+eq_res = find_eq(np.array(res.x), True)
+print("The resulting eq. is: ",  eq_res)
