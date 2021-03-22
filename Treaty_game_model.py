@@ -222,7 +222,7 @@ class DP:
              print(np.around(value[:t], 2)) if len(value) > t else print(np.around(value, 2))
              print()
          fig, (axes) = plt.subplots(1, 3, sharex = True, figsize = (14, 12))
-         titles2 = ['Period spending', 'Period consumption', 'Cumulative spending']
+         titles2 = ['Period spending', 'Period consumption', 'Cumulative consumptions']
          n_values = [n_best_spending, n_cons, np.cumsum(n_cons)]
          s_values = [s_best_spending, s_cons, np.cumsum(s_cons)]
          for ax, title, n_value, s_value in zip(axes, titles2, n_values, s_values):
@@ -281,7 +281,7 @@ if __name__ == "__main__":
     land = GraphPlot(0, 100, 1000)
     
     # two logistic functions A1, B1, C1, A2, B2, C2,     D, E, H, gamma_n, beta_s
-    ie = IncomeExpansion(120, 0.045, 18, 180, 0.065, 40, 8, 30, 100, 0.5, 0.5) # both logistic income function
+    ie = IncomeExpansion(120, 0.045, 18, 180, 0.065, 40, 0, 100, 150, 0.5, 0.5) # both logistic income function
     #sum_income = [ie.NativeIncome(land.xvalues), ie.SettlerIncome(100 - land.xvalues), ie.NativeIncome(land.xvalues)+ie.SettlerIncome(100 - land.xvalues)]
     #sep_income = [pf.NativeIncome(land.xvalues), pf.SettlerIncome(land.xvalues)]
     #cost_profit = [players3.NativeMI(land.xvalues), players3.SettlerMI(land.xvalues), \
@@ -294,6 +294,6 @@ if __name__ == "__main__":
     pd = PlayerDecision(ie, 1/6, 10)
     dp = DP(ie, pd)
     #print(dp.Simulation(65, 5))
-    ns_best_spending, n_land_list, spe_res = dp.DynamicNE(65, saving=True)
+    ns_best_spending, n_land_list, spe_res = dp.DynamicNE(75, saving=False)
     dp.PeriodResults(ns_best_spending, n_land_list)
     #print(time.time() - time_start)
