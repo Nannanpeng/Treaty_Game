@@ -110,10 +110,14 @@ class PlayerDecision:
              n_profit = revenue * self.periods - n_spending
          return n_profit
      
-    def NativeResponse(self, land, s_spending, current_p):
-         income = self.ie.NativeIncome(land)
-         Sfun = lambda n_spending: self.NativeProfit(land, n_spending, s_spending, current_p)
-         return fminbound(lambda s: -Sfun(s), 0, income)
+    def NativeResponse(self, land, s_spending, current_p, n_savings):
+        if n_savings == None:
+            income = self.ie.NativeIncome(land)
+        else:
+            income = self.ie.NativeIncome(land) + n_savings
+        income = self.ie.NativeIncome(land)
+        Sfun = lambda n_spending: self.NativeProfit(land, n_spending, s_spending, current_p)
+        return fminbound(lambda s: -Sfun(s), 0, income)
      
     def SettlerProfit(self, land, n_spending, s_spending, current_p):
          land_diff = self.ie.SettlerExpan(s_spending, land) - self.ie.NativeExpan(n_spending, 100 - land)
@@ -124,10 +128,59 @@ class PlayerDecision:
              s_profit = revenue * self.periods - s_spending
          return s_profit
      
-    def SettlerResponse(self, land, n_spending, current_p):
-         income = self.ie.SettlerIncome(land)
-         Sfun = lambda s_spending: self.SettlerProfit(land, n_spending, s_spending, current_p)
-         return fminbound(lambda s: -Sfun(s), 0, income)
+    def SettlerResponse(self, land, n_spending, current_p, s_savings):
+        if s_savings == None:
+            income = self.ie.SettlerIncome(land)
+        else:
+            income = self.ie.SettlerIncome(land) + s_savings
+        income = self.ie.SettlerIncome(land)
+        Sfun = lambda s_spending: self.SettlerProfit(land, n_spending, s_spending, current_p)
+        return fminbound(lambda s: -Sfun(s), 0, income)
+
+
+class NaivePlayerDecision:
+    '''
+    Several functions calculating player's reponse and profit in a naive sense.
+
+    Parameters:
+    ---------
+    IE: IncomeExpansion instance.
+    prob: probability to end the game in each period.
+    n_default: default periods without uncertainty at the begining of the game.
+    '''
+
+    def __init__(self, IE, prob, n_default):
+        self.ie = IE
+        self.periods = int((1 - prob)/prob)
+        self.n_dft = n_default
+
+    def NativeProfit(self, land, n_spending, s_spending, current_p):
+        land_diff = self.ie.NativeExpan(n_spending, land) 
+        revenue = self.ie.NativeIncome(land + land_diff) 
+        n_profit = revenue - n_spending
+        return n_profit
+
+    def NativeResponse(self, land, s_spending, current_p, n_savings):
+        if n_savings == None:
+            income = self.ie.NativeIncome(land)
+        else:
+            income = self.ie.NativeIncome(land) + n_savings
+        Sfun = lambda n_spending: self.NativeProfit(land, n_spending, s_spending, current_p)
+        return fminbound(lambda s: -Sfun(s), 0, income)
+
+    def SettlerProfit(self, land, n_spending, s_spending, current_p):
+        land_diff = self.ie.SettlerExpan(s_spending, land)
+        revenue = self.ie.SettlerIncome(land + land_diff)
+        s_profit = revenue - s_spending
+        return s_profit
+
+    def SettlerResponse(self, land, n_spending, current_p, s_savings):
+        if s_savings == None:
+            income = self.ie.SettlerIncome(land) 
+        else:
+            income = self.ie.SettlerIncome(land) + s_savings
+        Sfun = lambda s_spending: self.SettlerProfit(land, n_spending, s_spending, current_p)
+        return fminbound(lambda s: -Sfun(s), 0, income)
      
 class DP:
     '''
@@ -152,9 +205,9 @@ class DP:
          n_best_spending = []
          s_best_spending = []
          for s_spending in s_spending_list:
-             n_best_spending.append(self.pd.NativeResponse(n_land, s_spending, current_p))
+             n_best_spending.append(self.pd.NativeResponse(n_land, s_spending, current_p, n_savings))
          for n_spending in n_spending_list:
-             s_best_spending.append(self.pd.SettlerResponse(100 - n_land, n_spending, current_p))
+             s_best_spending.append(self.pd.SettlerResponse(100 - n_land, n_spending, current_p, s_savings))
          return [n_spending_list, s_spending_list], [s_best_spending, n_best_spending]
      
     def FindNE(self, income_list, spending_list): #[n_spending_list, s_spending_list], [s_best_spending, n_best_spending]
@@ -221,7 +274,7 @@ class DP:
              print(title)
              print(np.around(value[:t], 2)) if len(value) > t else print(np.around(value, 2))
              print()
-         fig, (axes) = plt.subplots(1, 3, sharex = True, figsize = (14, 12))
+         _, (axes) = plt.subplots(1, 3, sharex = True, figsize = (14, 12))
          titles2 = ['Period spending', 'Period consumption', 'Cumulative consumptions']
          n_values = [n_best_spending, n_cons, np.cumsum(n_cons)]
          s_values = [s_best_spending, s_cons, np.cumsum(s_cons)]
@@ -291,7 +344,11 @@ if __name__ == "__main__":
     #land.CostProfit(cost_profit)
     
     #time_start = time.time()
-    pd = PlayerDecision(ie, 1/6, 10)
+    naive = True
+    if naive:
+        pd = NaivePlayerDecision(ie, 1/6, 10)
+    else:
+        pd = PlayerDecision(ie, 1/6, 10)
     dp = DP(ie, pd)
     #print(dp.Simulation(65, 5))
     ns_best_spending, n_land_list, spe_res = dp.DynamicNE(75, saving=False)
