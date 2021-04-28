@@ -1,0 +1,89 @@
+
+{% set QualityOfLifeText = <span class='font-weight-bold'>Quality of Life</span> <img src='../images/quality-of-life-instructions.svg' width='32' height='32' /> %}
+{% set joyText = <span class='font-weight-bold'>Joy</span> <img src='../images/smiley.svg' width='32' height='32' /> %}
+{% set shockText = <span class='font-weight-bold'>Shock</span> <img src='../images/storm-2bolt.svg' width='32' height='32' /> %}
+{% set shocksText = <span class='font-weight-bold'>Shocks</span> <img src='../images/storm-2bolt.svg' width='32' height='32' /> %}
+{% set savingText = <span class='font-weight-bold'>Saving</span> <img src='../images/money-32.png' width='32' height='32' alt='Money' /> %}
+{% set savingsText = <span class='font-weight-bold'>Savings</span> <img src='../images/money-32.png' width='32' height='32' alt='Money' /> %}
+{% set insuranceText = <span class='font-weight-bold'>Insurance</span> <img src='../images/umbrella.svg' width='32' height='32' alt='Umbrella' /> %}
+{% set preventionText = <span class='font-weight-bold'>Prevention</span> <img src='../images/shield-2.svg' width='32' height='32' alt='shield' /> %}
+{% set spendingTableText = Spending Table %}
+{% set shockWheelText = Shock Wheel %}
+{% set spendingBarText = Spending Bar %}
+{% set probabilityText = <span class='font-weight-bold'>Chance</span> <img src='../images/whitedice.svg' width='32' height='32' /> %}
+
+{% event startLife() %}
+{% page Introduction %}
+{% header Welcome! %}
+{% hide left-panel %}
+{% hide middle-panel %}
+{% hide right-panel %}
+{% hide right-instruction %}
+{% show left-instruction %}
+
+This is an experiment in decision making.
+<br>
+Your earnings depend on decisions you make as well as the decision of the Player you are paired with.
+<br>
+If you have questions at any time, please raise your hand and a monitor will come to help.
+
+{% page Payouts %}
+{% header Payouts %}
+{% hide middle-panel %}
+{% set numPeriods = periodsPerLife[1] %}
+{% set totalPeriods = add(numPeriods, horizonPeriods) %}
+
+<ul>
+<li>The experiment is composed of several <span class='font-weight-bold'>Matches.</li>
+<li>Each Match has many <span class='font-weight-bold'>Periods.</li>
+<li>You will earn <span class='font-weight-bold'>Income every Period. </span>All Income is placed into your <span class='font-weight-bold'>Bank Balance.</li>
+<li>The more money in your final Bank Balance at the end of each Match, the more you will be paid in US Dollars.</li></ul>
+
+{% page Matching %}
+{% header Matching %}
+{% hide middle-panel %}
+{% set totalShockDuration = add(timing.shockDuration, timing.reviewDuration) %}
+
+<li>In this experiment, there are two types of Players: A and B. </li>
+<li>You will be the same type for the entire experiment.</li>
+<li>Each Match, Player A and Player B are paired up. You will be paired with a different person each Match.</li>
+
+
+{% page Territory Income %}
+{% header Territory Income %}
+{% hide middle-panel %}
+
+<li>In each Match, there is Territory.</li>
+<li>You control some Territory. Territory not under your control is controlled by the Player you are paired with.</li>
+<li>The more Territory you control, the higher your income.</li>
+
+
+{% page Territory Expansion %}
+{% header Territory Expansion %}
+{% hide middle-panel %}
+
+<ul>
+<li>Each Period, you may spend from your Bank Balance to perform Expansion.</li>
+<li>The more you spend, the higher your Expansion for the Period.</li>
+<li>Territory changes depending on how much each Player Expands.</li></ul>
+
+{% page Expansion Example %}
+{% header Expansion Example %}
+{% hide middle-panel %}
+
+<ul>
+<li>Suppose you control 40 Territory and perform 5 Expansion this Period.</li>
+<li>Example 1: The other Player Expands by 2. Next Period, you will control 40 + (5 - 2) = 43 Territory.</li>
+<li>Example 2: The other Player Expands by 5. Next Period, you will control 40 + (5 - 5) = 40 Territory.</li>
+<li>Example 3: The other Player Expands by 8. Next Period, you will control 40 + (5 - 8) = 37 Territory.</li></ul>
+
+{% page Treaties %}
+{% header Treaties %}
+{% hide middle-panel %}
+
+<ul>
+<li>Each Period, Player A may propose a Treaty, and Player B may accept, reject, or ignore the Treaty.</li>
+<li>Treaties have parts: a proposed Territory split, and a Payment.</li>
+<li>If Player B accepts a treaty, the territory is reallocated according to the Treaty terms, and Player A pays Player B the amount offered.</li>
+<li>Players may not Expand the same Period the Treaty is accepted.</li>
+<li>Either Player may Expand in future Periods.</li></ul>

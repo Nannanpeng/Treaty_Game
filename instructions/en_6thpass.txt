@@ -1,0 +1,361 @@
+{% page Introduction %}
+{% header Welcome! %}
+
+{% set joyText = <span class='font-weight-bold'>Joy</span><img src='../images/smiley.svg' width='32' height='32' /> %}
+{% set shockText = <span class='font-weight-bold'>Shock</span> <img src='../images/storm-2bolt.svg' width='32' height='32' /> %}
+{% set shocksText = <span class='font-weight-bold'>Shocks</span> <img src='../images/storm-2bolt.svg' width='32' height='32' /> %}
+{% set savingText = <span class='font-weight-bold'>Saving</span> <img src='../images/money-32.png' width='32' height='32' alt='Money' /> %}
+{% set savingsText = <span class='font-weight-bold'>Savings</span> <img src='../images/money-32.png' width='32' height='32' alt='Money' /> %}
+{% set insuranceText = <span class='font-weight-bold'>Insurance</span> <img src='../images/umbrella.svg' width='32' height='32' alt='Umbrella' /> %}
+{% set preventionText = <span class='font-weight-bold'>Prevention</span> <img src='../images/shield-2.svg' width='32' height='32' alt='shield' /> %}
+
+{% event startLife() %}
+{% hide left-panel %}
+{% hide middle-panel %}
+{% hide right-panel %}
+{% hide right-instruction %}
+{% show left-instruction %}
+
+This is a decision-making experiment.  
+You will be paid in cash.  
+The amount of cash you earn depends on your decisions, so read these instructions carefully.  
+If you have any questions, raise your hand and a monitor will come by to help.
+
+{% page Overview %}
+{% header Overview %}
+
+{% set numPeriods = 30 %}
+
+During this experiment, you will experience {% numLives %} lives.  
+Each life will have {% numPeriods %} periods.
+You will get paid for all {% numLives %} lives.
+In each period of life, you earn income and make decisions on how to spend your income. 
+You can spend your income on {% joyText %}, Shock {% preventionText %}, {% insuranceText %}, or {% savingText %} income for the future.
+The total amount of {% joyText %} you earn will determine the amount of cash you are paid.  
+The number of {% shocksText %} you get effects your {% joyText %}.
+
+{% page Shocks %}
+{% header Shocks <img src='../images/storm-2bolt.svg' width='32' height='32' />  %}
+
+Each period, there is a chance you will receive a {% shockText %}.  The chance increases with each period.
+{% shocksText %} decrease your <span class='font-weight-bold'>Joy</span> <img src='../images/smiley.svg' width='32' height='32' /> and increase your risk of additional future {% shocksText %}.
+For each {% shockText %} you receive, you lose <span class='negative'>{% playerType.shock.incomeSize %}</span> from the next period’s income.
+
+<br>
+<br>
+<br>
+
+The cost of a {% shockText %} can put you into debt. You cannot spend income on anything while you are in debt.
+If you go into debt, you will still earn income, but it will go directly toward paying off your debt.
+If you receive <span class='font-weight-bold'>{% maxShocks %}</span> {% shocksText %} during a life, you <span class='font-weight-bold'>DIE</span>
+and <span class='font-weight-bold'>CANNOT</span> earn {% joyText %} or continue to participate until the next life starts.
+You will have to wait until everyone else finishes their current life.
+The more {% shocksText %} you have, the less Joy you earn for the same {% joyText %} spending.
+
+<br>
+<br>
+<br>
+
+You can manage {% shocksText %} by:
+<ul class='ml-3'>
+    <li class='ml-3'><img src='../images/shield-2.svg' width='32' height='32' alt='Shield' /> Increasing <span class='font-weight-bold'>Prevention</span></li>
+    <li class='ml-3'><img src='../images/umbrella.svg' width='32' height='32' alt='Umbrella' /> Buying <span class='font-weight-bold'>Insurance</span></li>
+    <li class='ml-3'><img src='../images/money-32.png' width='32' height='32' alt='Money' /> <span class='font-weight-bold'>Saving</span> Income</li>
+</ul>
+
+{% page Prevention %}
+{% header Prevention <img src='../images/shield-2.svg' width='32' height='32' /> %}
+
+{% event percentDecline = toPercent(playerType.fitnesses[0].rate) %}
+
+The more {% preventionText %} you have, the less risk you have of getting a {% shockText %}.
+{% preventionText %} goes down a little ({% percentDecline %})% each period.
+If you buy {% preventionText %} it goes up. 
+
+{% page Income %}
+{% header Income %}
+
+{% show left-instruction %}
+
+Each period you will receive an income that you can spend on the following:
+<ol><li>{% preventionText %}, to decrease you risk of receiving a {% shockText %}.</li><li>{% joyText %}, to get more {% joyText %}. (Total {% joyText %} determines how much cash you get paid.)</li><li>{% insuranceText %}, to cover the financial cost of a {% shockText %}.<ul><li>If you purchase {% insuranceText %} and get a {% shockText %} that period, the insurance will pay the cost.</li><li>If you do not purchase {% insuranceText %} and get a {% shockText %}, the cost of the {% shockText %} will be deducted from your Savings or future income.</li></ul></li><li>{% savingsText %}, to have more money to spend in future periods. Unspent {% savingsText %} carries from period to period within a Life (but not across lives).</li></ol>
+
+{% page Stages %}
+{% header Stages %}
+
+{% hide middle-panel %}
+{% event totalShockDuration = add(timing.shockDuration, timing.reviewDuration) %}
+
+Each period has 2 stages.
+<ol><li>During the first stage ({% translations.stages.spending %}), you will have {% timing.investmentDuration %} seconds to decide how to spend your income.</li><li>During the second stage ({% translations.stages.shock_draw %}), the {% shockText %} wheel will spin and you will see if you got a {% shockText %} ({% totalShockDuration %} seconds).</li></ol>
+
+{% page Status Bar %}
+{% header Status Bar %}
+
+{% show status-bar %}
+{% hide investment-panel %}
+{% show middle-panel %}
+
+On your screen you will see the current period, the current stage, and the time remaining in the stage in the status bar.
+
+{% page Spending %}
+{% header Spending %}
+
+{% makeInvisible investment-plots %}
+{% makeInvisible insurance-container %}
+{% makeInvisible investment-table %}
+{% show investment-panel %}
+{% set initSavings = 30 %}
+{% event startInvestment() %}
+
+You make spending decisions in the center of the screen below the status bar. The green colored bar has two tabs, one above and one below, that are used to spend money in different categories.
+<br>
+<br>
+On the right end of the green bar you will see your spending budget of {% client.statusController.myStatus.budget %} for the period. 
+At the bottom of your screen you will see your Income for the period of {% client.statusController.myStatus.periodIncome %}.
+The period income is added to any unspent money from previous periods to create your spending budget.
+
+{% page Savings %}
+{% header <img src='../images/money-32.png' width='32' height='32' alt='Money' /> Savings %}
+{% makeInvisible investment-table-fitness-header %}
+{% makeInvisible investment-table-joy-header %}
+{% makeVisible investment-table %}
+{% set initSavings = 30 %}
+{% event startInvestment() %}
+
+The green portion of the bar shows your savings. This is the amount of money that would carry over to the next period. Currently, all of your money is going to savings.
+<br>
+<br>
+Just below the spending bar is a table that shows the result of your spending. You started the period with {% initSavings %} in savings and will end the period with {% client.statusController.myStatus.budget %} in savings
+after saving the {% client.statusController.myStatus.periodIncome %} income this period.
+
+{% page Joy Spending %}
+{% header <img src='../images/smiley.svg' width='32' height='32' /> Joy Spending %}
+{% makeVisible investment-table-joy-header %}
+{% makeInvisible investment-plots %}
+
+The yellow portion of the bar shows the amount spent on {% joyText %}. Slide the tab on the bottom of the bar to change your {% joyText %}. Notice that this is moving money from Savings to {% joyText %}. Please change your {% joyText %} in order to continue to the next page of instructions.
+
+{% waitFor joySpending %}
+
+{% page Joy Spending2 %}
+{% header <img src='../images/smiley.svg' width='32' height='32' /> Joy Spending %}
+{% makeInvisible fitnessinvestment %}
+{% makeVisible investment-plots %}
+{% makeInvisible investment-table-fitness-header %}
+
+Above the spending bar you will see the Joy graph on the right. The top line on the Joy graph shows the relationship between how much you spend, and how much Joy you receive. The lower line is what your Joy would be if you get another shock.
+<br>
+<br>
+The yellow dot shows the {% joyText %} decision. The number on the bottom is the amount spent on {% joyText %},
+and matches the length of the yellow part of the spending bar. The number on the left is the number of {% joyText %} points that buys. 
+Remember these points are how you get cash at the end. Please change your Joy investment again to see how the spending bar and the Joy graph interact.
+
+{% waitFor joySpending %}
+
+{% page Prevention Spending %}
+{% header <img src='../images/shield-2.svg' width='32' height='32' alt='Shield' /> Prevention Spending %}
+{% makeVisible investment-table-fitness-header %}
+{% makeVisible fitnessinvestment %}
+
+The blue portion of the bar shows the amount spent on {% preventionText %}. Slide the tab on the top of the spending bar to change your {% preventionText %} spending.
+<br>
+<br>
+As you slide the tab on the top of the spending bar pay attention to the blue and yellow dots on the {% preventionText %} and {% joyText %} graphs above.
+The blue dot shows the level of {% preventionText %} achieved and the yellow dot shows the level of {% joyText %} achieved by spending.
+<br>
+<br>
+The blue dot and yellow dot move in opposite directions as you change the tab on the top of the spending bar. 
+This implies that as you slide the tab on the top of the spending bar you are moving spending between {% preventionText %} and {% joyText %}.
+<br>
+<br>
+Please change your {% preventionText %} spending in order to continue on to the next page of instructions.
+
+{% waitFor preventionSpending %}
+
+{% page Prevention Spending2 %}
+{% header <img src='../images/shield-2.svg' width='32' height='32' alt='Shield' /> Prevention Spending %}
+{% makeInvisible insurance-container %}
+
+Sliding the top tab on the spending bar is not the only way to adjust Prevention spending. You can also drag the yellow portion of the spending bar in order
+to move spending between {% preventionText %} and {% savingsText %} without changing {% joyText %} spending.
+<br>
+<br>
+Please change your {% preventionText %} spending by dragging the yellow portion of the spending bar in order to continue on to the next page of instructions.
+
+{% waitFor barDrag %}
+
+{% page Insurance %}
+{% header <img src='../images/umbrella.svg' width='32' height='32' alt='Umbrella' /> Insurance %}
+{% makeVisible insurance-container %}
+{% event resumeInvestmentState() %}
+
+<ul><li>Each period, you can buy {% insuranceText %}.</li><li>{% insuranceText %} does <span class='font-weight-bold'>not change</span> the risk of a <span class='font-weight-bold'>Shock!</span><img src='../images/storm-2bolt.svg' width='32' height='32' alt='Storm' /></li><li>{% insuranceText %} only pays for the financial cost of a {% shockText %} so you don't have to use your {% savingsText %} or income to do so.</li><li>{% insuranceText %} does not carry forward to the next period, so it must be bought in every period it is desired.</li></ul>
+<br>
+<br>
+Click on the check-box underneath "<img src='../images/umbrella.svg' width='32' height='32' /> Buy Insurance?" in order to buy {% insuranceText %}. Do this now.
+<br>
+<br>
+Notice that insurance spending is purple on the spending bar and that the size of the bar represents the cost of {% insuranceText %}, {% client.investmentControl.insPremium %}.
+
+{% waitFor insuranceCheck %}
+
+{% page Shocks %}
+{% header <img src='../images/storm-2bolt.svg' width='32' height='32' /> Shocks %}
+
+{% hide middle-panel %}
+{% makeInvisible history-panel %}
+{% makeInvisible shock-table %}
+{% show right-panel %}
+{% event setInvestmentStage() %}
+
+In the upper right corner of your screen you will see a wheel. The red part of that wheel shows your chance of {% shockText %}.
+
+{% page Shocks %}
+{% header <img src='../images/storm-2bolt.svg' width='32' height='32' /> Shocks %}
+
+{% makeInvisible investment-panel %}
+{% show middle-panel %}
+{% event startShockDraw() %}
+
+When the wheel stops spinning, if the black arrow points to the red slice, you receive a {% shockText %}. The outcome will also be shown in the status bar.
+
+{% page Shocks %}
+{% header <img src='../images/storm-2bolt.svg' width='32' height='32' /> Shocks %}
+{% makeVisible investment-panel %}
+{% makeInvisible shock-table %}
+{% event setInvestmentStage() %}
+{% event resumeInvestmentState() %}
+
+You can decrease the chance of a {% shockText %} by spending more on {% preventionText %}. Notice how the size of the red slice in the Shock Wheel gets smaller when you increase {% preventionText %} spending. Change your {% preventionText %} spending now to continue to the next page.
+
+{% waitFor preventionSpending %}
+
+{% page Shocks %}
+{% header <img src='../images/storm-2bolt.svg' width='32' height='32' /> Shocks %}
+{% makeVisible shock-table %}
+
+The table to the right of the Shock Wheel shows how additional {% shockText %} will effect your Health, your chance of future {% shocksText %}, and your {% joyText %}.
+
+{% page Debt %}
+{% header <img src='../images/red-money-32.png' width='32' height='32' alt='Debt' />  Debt %}
+{% hide right-panel %}
+{% show middle-panel %}
+
+{% event startInvestmentWithDebt() %}
+
+If you go into debt, the end of period value will display as a negative and the spending bar will turn red.
+If your End of Period savings is negative, the only thing you can spend money on is insurance.
+You can buy insurance as long as your income for the period is more than the cost of the insurance.
+If you get a {% shockText %}, {% playerType.shock.incomeSize %} is taken away from your budget next period.
+if this is more than your income, you are in 'Debt' and will be until you pay back all of the {% shockText %} cost.
+
+{% page Groups %}
+{% header Groups %}
+
+{% hide middle-panel %}
+{% hide left-panel %}
+{% hide right-panel %}
+{% event otherPlayerCount = getOtherPlayerCount() %}
+
+<ul><li>We have randomly assigned you to a group with {% otherPlayerCount %} other participants.</li><li>Group members are anonymous.</li><li>Each group member is assigned a color.</li><li>Your group will be the same for the entire experiment.</li></ul>
+
+{% page Groups %}
+{% header Groups %}
+
+{% makeInvisible chat-panel %}
+{% show left-panel %}
+{% show right-panel %}
+
+You can view your group members' statuses in the upper left corner.
+<br>
+<br>
+The columns refer to:
+<br>
+<img src='../images/storm-2bolt.svg' width='32' height='32' /> Shock Count
+<br>
+<img src='../images/whitedice.svg' width='32' height='32' /> Shock Probability
+<br>
+<img src='../images/shield-2.svg' width='32' height='32' /> Prevention
+<br>
+<img src='../images/smiley.svg' width='32' height='32' /> Total Joy this Life
+<br>
+<img src='../images/money-32.png' width='32' height='32' /> Current budget
+
+{% page Group Chat %}
+{% header Group Chat %}
+
+{% hide left-panel %}
+{% hide right-panel %}
+{% makeInvisible chat-panel %}
+
+<ul><li>You can chat with other members of your group using the chat window.</li><li>You may chat about anything you wish, however issuing threats or revealing your personal identity is strictly prohibited!</li><li>Please refrain from profanity.</li></ul>
+
+{% page Group Chat %}
+{% header Group Chat %}
+
+{% show left-panel %}
+{% show right-panel %}
+{% makeVisible chat-panel %}
+{% makeInvisible history-panel %}
+
+The chat window is on the left side of the screen. 
+<br>
+<br>
+Click on Send, type a message and press <span class='font-weight-bold'>Enter</span> or <span class='font-weight-bold'>Return</span> to send it. Do this now.
+
+{% waitFor chatMessage %}
+
+{% page History %}
+{% header History %}
+
+{% makeInvisible fitness-history %}
+{% makeVisible history-panel %}
+
+Click the corresponding icons to display an aspect in the graph.
+<br>
+<br>
+<img src='../images/whitedice.svg' width='32' height='32' /> Shock Probability
+<br>
+<img src='../images/shield-2.svg' width='32' height='32' /> Prevention
+<br>
+<img src='../images/smiley.svg' width='32' height='32' /> Total Joy this Life
+<br>
+<img src='../images/money-32.png' width='32' height='32' /> Current budget
+<br>
+<br>
+Please click through all options to continue.
+
+{% waitFor historyReview %}
+
+{% page History %}
+{% header History %}
+
+{% makeVisible fitness-history %}
+
+In the bottom right, you can see your group members' {% shockText %} and {% insuranceText %} history over the Life.
+
+{% page Summary %}
+{% header Summary %}
+
+{% hide left-panel %}
+{% hide right-panel %}
+
+<ul><li>Your goal is to accrue as much {% joyText %} in Life as you can.</li><li>You will have <span class='negative'>{% numLives %}</span> lives.</li><li>Each Life contains <span class='negative'>{% periodsPerLife %}</span> periods of savings and spending.</li><li>You will earn ________________________ income every period.</li><li>A {% shockText %} will cost <span class='negative'>{% playerType.shock.incomeSize %}</span> from your {% savingsText %} or future income.</li><li>You are paid <span class='positive'>$1</span> cash per <span class='positive'>{% playerType.exchangeRate %}</span> accrued {% joyText %} points.</li></ul>
+
+{% page Summary %}
+{% header Summary %}
+
+In each period, you will decide:
+<br>
+<ol><li><span class='font-weight-bold'>How much to spend on {% preventionText %}:</span> The higher your {% preventionText %} level, the better you can prevent {% shocksText %} and the more {% joyText %} you get.</li><li><span class='font-weight-bold'>How much to spend on Joy:</span> The more {% joyText %} you earn, the more cash you get paid.</li><li><span class='font-weight-bold'>How much to Save:</span> Any {% savingsText %} carries forward to the next period, but not the next Life.</li><li><span class='font-weight-bold'>Whether to buy Insurance:</span> {% insuranceText %} will prevent financial harm from {% shocksText %} that period.</li></ol>
+
+{% page Summary %}
+{% header Summary %}
+
+<ul><li>We have assigned you to a group with {% otherPlayerCount %} other participants with whom you can chat.</li><li>If you receive {% client.expParams.maxShocks %} {% shocksText %} in a life, you die and have to wait until everyone completes the current life before you can participate again.</li><li><span style='foreground: blue;'>Before we begin, you will have a brief, {% periodsPerLife[0] %} period life, to practice using the controls.</span></li></ul>
+
+{% page Instructions Complete %}
+{% header Instructions Complete %}
+
+You have completed the instructions. Please wait patiently for others to finish. While you wait, you still have the ability to browse the instructions. 

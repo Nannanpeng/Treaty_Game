@@ -1,0 +1,81 @@
+\documentclass[12pt]{article} %,a4paper
+\usepackage{appendix}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage[affil-it]{authblk}
+\usepackage[round]{natbib}
+\usepackage{newtxtext,newtxmath} % Time New Rome 
+\usepackage{enumerate}
+\usepackage{caption} 
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage{booktabs, multirow}
+%\includegraphics{pdf/image}
+\usepackage{siunitx}                        % added
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\usepackage{threeparttable}
+\usepackage{tabularx}
+\usepackage{longtable}
+%\usepackage{blindtext}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{dcolumn}
+\usepackage{rotating}
+\usepackage{float}
+\usepackage{footmisc}
+\usepackage{graphicx}
+\let\oldfootnote\footnote
+\renewcommand\footnote[1]{%
+	\oldfootnote{\hspace{1.5mm}#1}}
+%\usepackage[colorlinks=]{hyperref}
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	%    allcolors= black,
+	citecolor =blue,
+	linkcolor=blue,
+	filecolor=white,      
+	urlcolor=black,
+}
+\usepackage[noabbrev]{cleveref}
+%\restylefloat{table}
+%\usepackage[tableposition=top]{caption}
+
+\setlength{\footnotemargin}{4mm}
+\setlength{\footnotesep}{0.4cm}
+\setlength{\skip\footins}{1cm}
+\setlength{\parindent}{1.0em}
+\setlength{\parskip}{0.5em}
+\renewcommand{\baselinestretch}{1.5} 
+%--------%
+\let\ACMmaketitle=\maketitle
+\renewcommand{\maketitle}{\begingroup\let\footnote=\thanks \ACMmaketitle\endgroup}
+\begin{document}
+\title{Treaty Models}
+%\author{Philipp Limberg %
+%	\thanks{\hspace{1mm}Student ID: 2324396. Email: limberg@chapman.edu}}
+%\affil{Economic Science Institute \\ Chapman University
+%}
+\date{\today}
+\maketitle
+
+%----------------------------------%
+\section{Models}
+\subsection{Treaty Length}
+	$$L_{treaty} \sim  Poisson(\lambda)$$
+	$$ \lambda = \alpha+\beta_1 D_{annuity} + \beta_2 X_{controls}$$
+	$$\alpha, \beta_1, \beta_2 \sim  N(0, 25)$$
+	$$\sigma \sim  HalfCauchy(0,10)$$
+where $L_{treaty}$ is the length the treaty lasted (in periods) regressed on a dummy whether it was an annuity treatment. Controls could be some variables like land split intervals.
+\subsection{Efficiency of system}
+$$\pi_{system} \sim  N(\mu, \sigma)$$
+$$ \mu = \alpha + \beta_1D_{annuity} + \beta_2D_{lump_sum} + \beta_3Teaties + \beta_4L_{match}$$
+$$\alpha, \beta_1, \beta_2, \beta_3, \beta_4 \sim  N(\mu, \sigma)$$
+$$\sigma \sim  HalfCauchy(0,10)$$
+Where $L_{match}$ is the length that a match lasted.
+\subsection{Profit of players}
+$$\pi \sim  N(\mu, \sigma)$$
+$$\pi = \alpha+\beta_1 D_{annuity} + \beta_2D_{lump_sum} +\beta_3Role + \beta_4Treaties + \beta L_{match}$$
+$$\sigma \sim  HalfCauchy(0,10)$$
+\subsection{Path to Equilibrium}
+WIP
+\end{document}
