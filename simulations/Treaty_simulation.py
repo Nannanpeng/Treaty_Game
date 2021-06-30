@@ -111,9 +111,11 @@ def TreatySimulation(n_land_start, tr,
                         n_savings_end += transfer
                         s_savings_end -= transfer
                         have_treaty = True
+                        treaty_counter = 0
                         while current_period <= tot_periods:
+                            treaty_counter += 1
                             obs = [match, current_period, 0, 0, n_savings_init, n_savings_end, s_savings_init, s_savings_end, 
-                                   n_land_init, n_land_end, 100-n_land_init, 100-n_land_end, n_income, s_income, treaty_type, transfer, None]
+                                   n_land_init, n_land_end, 100-n_land_init, 100-n_land_end, n_income, s_income, treaty_type, treaty_counter, transfer, None]
                             match_obs.append(obs)
                             n_income = ie.NativeIncome(n_land_end)
                             s_income = ie.SettlerIncome(s_treaty_land)
@@ -148,7 +150,7 @@ def TreatySimulation(n_land_start, tr,
                             s_savings_end = s_savings_init + s_income
                             n_land_end = n_land_init
                             obs = [match, current_period, 0, 0, n_savings_init, n_savings_end, s_savings_init, s_savings_end, 
-                                   n_land_init, n_land_end, 100-n_land_init, 100-n_land_end, n_income, s_income, np.nan, np.nan, None]
+                                   n_land_init, n_land_end, 100-n_land_init, 100-n_land_end, n_income, s_income, np.nan, None, np.nan, None]
                             match_obs.append(obs)
                             current_period += 1
                             n_savings_init = n_savings_end
@@ -167,7 +169,7 @@ def TreatySimulation(n_land_start, tr,
                     n_land_init, current_period, spending_shock, n_savings_end, s_savings_end, spending_shock_size)  # fighting results
                 n_land_end = n_land_init + n_land_diff
                 obs = [match, current_period, n_spending, s_spending, n_savings_init, n_savings_end, s_savings_init, 
-                       s_savings_end,  n_land_init, n_land_end, 100-n_land_init, 100-n_land_end, n_income, s_income, np.nan, np.nan, None]
+                       s_savings_end,  n_land_init, n_land_end, 100-n_land_init, 100-n_land_end, n_income, s_income, np.nan, None, np.nan, None]
                                                                     # treaty_type, transfer, treaty_num, broken_reason
                 current_period += 1
                 n_land_init = n_land_end
@@ -175,7 +177,7 @@ def TreatySimulation(n_land_start, tr,
                 s_savings_init = s_savings_end
                 match_obs.append(obs)
     cols = ['Match', 'CurrentPeriod', 'NativeSpending', 'SettlerSpending', 'InitNativeSaving', 'EndNativeSaving', 'InitSettlerSaving', 'EndSettlerSaving', 
-            'InitNativeLand', 'EndNativeLand', 'InitSettlerLand','EndSettlerLand', 'NativeIncome','SettlerIncome', 'TreatyType', 'TreatyPayment', 'TreatyEndingReason']
+            'InitNativeLand', 'EndNativeLand', 'InitSettlerLand','EndSettlerLand', 'NativeIncome','SettlerIncome', 'Treatment','TreatyPeriod', 'TreatyPayment', 'TreatyEndingReason']
     simulated_data = pandas.DataFrame(data=match_obs,  columns=cols)
     return simulated_data
 
